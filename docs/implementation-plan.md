@@ -79,10 +79,10 @@ Acceptance: selecting, replacing and removing images works; no image is sent to 
 
 ### Milestone 2 — Offline model quality test
 
-- [x] Add a browser-side, consent-gated integration to the public KlingTeam/LivePortrait Gradio API.
-- [x] Capture a 4-second, 512×512 square webcam driving clip in the browser (silent; no microphone audio is recorded).
-- [x] Submit the selected portrait and driving clip to the published `/gpu_wrapped_execute_video` endpoint using the Gradio JavaScript client.
-- [x] Display the returned processed video when the Space returns a playable file.
+- [ ] Add a consent-gated integration to a verified LivePortrait inference endpoint.
+- [ ] Capture a short webcam driving clip in the browser without recording microphone audio.
+- [ ] Submit the selected portrait and driving clip to the verified endpoint.
+- [ ] Display the returned processed video and handle provider queue/errors.
 - [ ] Provision a TURN-owned remote GPU environment.
 - [ ] Pin a known LivePortrait revision and its model weights.
 - [ ] Run a short test using a user-authorized portrait and a webcam driving clip.
@@ -114,8 +114,8 @@ Acceptance: video and voice remain synchronized during a sustained test.
 
 ### Milestone 5 — ManyCam integration
 
-- [ ] Render the returned stream in a dedicated TURN output view.
-- [ ] Test whether ManyCam 4.11.2 can capture that view reliably.
+- [x] Add a dedicated output window that mirrors the current TURN canvas for capture by another desktop application.
+- [ ] Test whether ManyCam Vision 4.11.2 can capture that window reliably.
 - [ ] Verify no recursive camera feedback.
 - [ ] Verify the call application receives the intended video and audio devices.
 
@@ -131,4 +131,42 @@ Acceptance: an external call app receives the processed avatar video while the u
 
 ## Current status
 
-The frontend identity-selection milestone has been implemented in `index.html`. A first browser-to-LivePortrait batch-test integration has been committed. It depends on the public third-party Space, its current Gradio API, browser support for square WebM recording, and free shared-GPU availability. It has not yet been verified end-to-end with a user portrait, so the model-quality acceptance test remains open. Live webcam streaming, original microphone audio passthrough, WebRTC, and ManyCam are not implemented.
+The frontend identity-selection milestone is implemented in `index.html`. The current page uses MediaPipe face detection and draws a cropped portion of the uploaded portrait over the detected webcam face. This is a crude local overlay, not AI identity animation: it does not reproduce the portrait's facial expressions, mouth movement, or head rotation. The code currently contains no LivePortrait Gradio client, no `gpu_wrapped_execute_video` integration, no MediaRecorder batch-upload path, and no remote AI endpoint. A dedicated `output.html` window now mirrors the current canvas so ManyCam can attempt to capture it, but ManyCam 4.11.2 capture has not been verified. Remote inference, real-time identity animation, microphone passthrough, WebRTC, and end-to-end ManyCam delivery remain unimplemented.
+
+
+## Free compute provider assessment (checked 19 November 2026)
+
+A free GPU notebook is not automatically a production GPU server. The following options are candidates with distinct constraints:
+
+| Provider | Free access found | Can it be the permanent TURN live worker? |
+|---|---|---|
+| Kaggle Notebooks | Weekly GPU quota (commonly 30 hours); interactive sessions have time limits and capacity can vary. | No guarantee of stable public WebRTC ingress/egress or uninterrupted hosting. Use for building and model optimization, not the production endpoint. |
+| Hugging Face ZeroGPU | 5 GPU minutes per day on a free account; Gradio-only ZeroGPU hosting. | No; daily quota and request-oriented GPU allocation are unsuitable for continuous calls. |
+| Lightning AI | Promotional GPU credits/free hours may be available after verification; GPU usage is metered and credits are finite. | Only while valid credits remain; not a permanent $0 production guarantee. |
+| Paperspace Gradient | Free notebook/GPU availability is plan- and capacity-dependent; session limits apply. | Not verified as a stable, always-on public live-video service. |
+| Modal | Starter includes monthly compute credits, but a payment method and billing safeguards may be required; overage can cost money. | Not a strict no-card/no-charge solution unless account-level spending is safely disabled and credits are sufficient. |
+| SageMaker Studio Lab | Existing users may have limited GPU sessions; AWS says it is no longer open to new customers. | Not a new-account solution and does not provide production model deployment. |
+
+No provider above is currently verified as a guaranteed, always-on, zero-cost GPU service for TURN. Do not build a production promise around free trial credits, notebook sessions, queued demos, or a GPU allowance.
+
+## Current implementable work versus remaining work
+
+### Implemented now
+- Local portrait select, replace and remove.
+- Local webcam permission/start/stop.
+- Browser-side face detection.
+- Existing local portrait crop overlay (explicitly not AI identity animation).
+- Dedicated output window mirroring the canvas for ManyCam window-capture testing.
+
+### Still required for the actual product
+- Replace the crop overlay with a real identity-animation model.
+- Select a legally usable model and separately audit every pretrained weight/dependency license.
+- Provision a persistent GPU worker with a stable authenticated endpoint.
+- Implement a streaming adapter and WebRTC signaling/media transport.
+- Forward original microphone audio and verify audio/video synchronization.
+- Add secure session authorization, short-lived media handling, reconnect and cleanup.
+- Verify ManyCam Vision 4.11.2 capture and calling-app device selection.
+- Run sustained quality, latency, stability and privacy acceptance tests.
+
+### Production acceptance gate
+TURN is not considered complete until a user-authorized portrait is animated live from webcam movement, the output is sustained beyond the daily quota of any demo service, original microphone audio remains synchronized, ManyCam receives the output, and the complete path has been tested end-to-end.
