@@ -1,0 +1,51 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1">
+<meta name="theme-color" content="#05080e">
+<title>TURN — ManyCam Output</title>
+<style>
+*{box-sizing:border-box}html,body{margin:0;width:100%;height:100%;overflow:hidden;background:#05080e;color:#dbe7f4;font:14px/1.4 Inter,system-ui,Segoe UI,sans-serif}
+main{width:100%;height:100%;display:grid;place-items:center;position:relative}
+canvas{display:block;width:100%;height:100%;object-fit:contain}
+.tag{position:absolute;left:18px;top:16px;padding:7px 11px;border:1px solid #40516b;border-radius:8px;background:#080d16d9;color:#dbe7f4;font-size:11px;letter-spacing:.08em}
+.message{position:absolute;inset:0;display:grid;place-content:center;text-align:center;padding:24px;color:#9eacc0}
+.message strong{color:#eaf2fc;font-size:19px;margin-bottom:8px}
+</style>
+</head>
+<body>
+<main>
+<canvas id="output" width="1280" height="720"></canvas>
+<div class="tag">TURN STUDIO · OUTPUT PREVIEW</div>
+<div class="message" id="message"><strong>Waiting for TURN Studio</strong>Keep the main TURN Studio tab open and activate its camera output.</div>
+</main>
+<script>
+const canvas=document.getElementById('output'),ctx=canvas.getContext('2d');
+const message=document.getElementById('message');
+let source=null,hasFrame=false;
+function draw(){
+  if(!window.opener||window.opener.closed){
+    message.style.display='grid';
+    message.innerHTML='<strong>TURN Studio is not connected</strong>Open this window from the main TURN Studio page.';
+    requestAnimationFrame(draw);return;
+  }
+  try{
+    source=window.opener.document.getElementById('portraitOutput');
+    if(source&&source.width&&source.height&&source.style.display!=='none'){
+      ctx.fillStyle='#05080e';ctx.fillRect(0,0,canvas.width,canvas.height);
+      const scale=Math.min(canvas.width/source.width,canvas.height/source.height);
+      const w=source.width*scale,h=source.height*scale;
+      ctx.drawImage(source,(canvas.width-w)/2,(canvas.height-h)/2,w,h);
+      hasFrame=true;message.style.display='none';
+    }else if(!hasFrame){message.style.display='grid';}
+  }catch(e){
+    message.style.display='grid';
+    message.innerHTML='<strong>Output access was blocked</strong>Keep both TURN windows on the same website origin and reopen the output window.';
+  }
+  requestAnimationFrame(draw);
+}
+draw();
+</script>
+</body>
+</html>
