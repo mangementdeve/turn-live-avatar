@@ -6,13 +6,14 @@ A lightweight browser frontend for a consent-based, identity-preserving live por
 
 - Responsive TURN studio interface.
 - Local camera preview and stop control.
+- Dedicated clean output window that mirrors the current TURN canvas for ManyCam window capture.
 - Microphone permission check (does not record or transmit audio).
 - Replaceable portrait selection with JPG, PNG and WebP validation.
 - Local portrait preview, image dimensions and file-size display.
 - Remove selected portrait and release its browser object URL.
-- Explicit status showing that AI animation and streaming are not connected yet.
+- Explicit status showing that true AI identity animation and remote streaming are not connected yet.
 
-The portrait selection is currently browser-local. Images are not uploaded to an AI service, stored in an account, or committed to this repository.
+The portrait selection is currently browser-local. Images are not uploaded to an AI service, stored in an account, or committed to this repository. The ManyCam output window mirrors the current local canvas only; it does not turn the existing face-crop overlay into AI animation.
 
 ## Product requirements
 
@@ -40,7 +41,7 @@ LivePortrait is an image/video portrait-animation implementation; it is not, by 
 - ManyCam integration test.
 - Authentication, consent enforcement and secure server-side upload handling.
 
-See [docs/implementation-plan.md](docs/implementation-plan.md) for the staged engineering plan and acceptance tests.
+See [docs/implementation-plan.md](docs/implementation-plan.md) for the staged engineering plan, free-compute assessment and acceptance tests.
 
 ## Development and deployment
 
