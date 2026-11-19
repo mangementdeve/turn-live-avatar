@@ -79,7 +79,11 @@ Acceptance: selecting, replacing and removing images works; no image is sent to 
 
 ### Milestone 2 — Offline model quality test
 
-- [ ] Provision a remote GPU environment.
+- [x] Add a browser-side, consent-gated integration to the public KlingTeam/LivePortrait Gradio API.
+- [x] Capture a 4-second, 512×512 square webcam driving clip in the browser (silent; no microphone audio is recorded).
+- [x] Submit the selected portrait and driving clip to the published `/gpu_wrapped_execute_video` endpoint using the Gradio JavaScript client.
+- [x] Display the returned processed video when the Space returns a playable file.
+- [ ] Provision a TURN-owned remote GPU environment.
 - [ ] Pin a known LivePortrait revision and its model weights.
 - [ ] Run a short test using a user-authorized portrait and a webcam driving clip.
 - [ ] Compare the output with the source for facial identity, skin texture, skin tone, eye/lip geometry, expression range and artifacts.
@@ -127,4 +131,4 @@ Acceptance: an external call app receives the processed avatar video while the u
 
 ## Current status
 
-The frontend identity-selection milestone has been implemented in `index.html`. The AI worker, live stream and ManyCam pipeline are not yet implemented. Do not mark them complete until the corresponding acceptance tests pass.
+The frontend identity-selection milestone has been implemented in `index.html`. A first browser-to-LivePortrait batch-test integration has been committed. It depends on the public third-party Space, its current Gradio API, browser support for square WebM recording, and free shared-GPU availability. It has not yet been verified end-to-end with a user portrait, so the model-quality acceptance test remains open. Live webcam streaming, original microphone audio passthrough, WebRTC, and ManyCam are not implemented.
