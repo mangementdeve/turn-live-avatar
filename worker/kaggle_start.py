@@ -72,7 +72,7 @@ for _ in range(60):
         raise SystemExit("Cloudflare Tunnel exited.")
     try:
         content = (LOG_DIR / "tunnel.log").read_text(errors="ignore")
-        match = re.search(r"https://[a-z0-9-]+\\.trycloudflare\\.com", content)
+        match = re.search(r"https://[a-z0-9-]+\.trycloudflare\.com", content)
         if match:
             public_url = match.group(0)
             break
