@@ -147,7 +147,7 @@ async function connectGpuWorker(){
  workerSocket.onmessage=async(event)=>{
   if(typeof event.data==='string'){
    let msg;try{msg=JSON.parse(event.data);}catch(_){return;}
-   if(msg.type==='ready'){workerReady=true;workerStatus('GPU worker ready · '+(msg.device||'CUDA'),true);document.getElementById('previewStatus').textContent='AI AVATAR LIVE';outputMessage.textContent='LivePortrait is processing webcam frames on your remote GPU. The original microphone stays local.';}
+   if(msg.type==='dropped'){workerBusy=false;return;}if(msg.type==='ready'){workerReady=true;workerStatus('GPU worker ready · '+(msg.device||'CUDA'),true);document.getElementById('previewStatus').textContent='AI AVATAR LIVE';outputMessage.textContent='LivePortrait is processing webcam frames on your remote GPU. The original microphone stays local.';}
    else if(msg.type==='error'){workerReady=false;workerBusy=false;workerStatus('Worker error: '+msg.message);outputMessage.textContent=msg.message;}
    else if(msg.type==='stats'){workerStatus('GPU worker active · '+msg.frames+' frames · latest inference '+msg.worker_ms+' ms',true);}
    return;
