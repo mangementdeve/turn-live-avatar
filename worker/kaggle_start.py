@@ -5,6 +5,7 @@ import time
 import stat
 import urllib.request
 import subprocess
+import secrets
 from pathlib import Path
 
 ROOT = Path("/kaggle/working/LivePortrait")
@@ -28,6 +29,9 @@ if not cloudflared.exists():
     urllib.request.urlretrieve(url, cloudflared)
     cloudflared.chmod(cloudflared.stat().st_mode | stat.S_IXUSR | stat.S_IXGRP | stat.S_IXOTH)
 
+worker_token = secrets.token_urlsafe(32)
+worker_env = os.environ.copy()
+worker_env["TURN_WORKER_TOKEN"] = worker_token
 worker_log = open(LOG_DIR / "worker.log", "w")
 worker = subprocess.Popen(
     [sys.executable, str(WORKER)],
@@ -35,6 +39,7 @@ worker = subprocess.Popen(
     stdout=worker_log,
     stderr=subprocess.STDOUT,
     start_new_session=True,
+    env=worker_env,
 )
 print("Starting TURN LivePortrait worker (model loading can take 1–2 minutes)…")
 
@@ -81,6 +86,7 @@ if not public_url:
 
 print("\\nTURN GPU WORKER IS AVAILABLE")
 print("Worker URL:", public_url)
-print("Paste this URL into TURN Studio → Animation pipeline → Kaggle GPU worker address.")
+print("Worker token:", worker_token)
+print("Paste the URL and token into TURN Studio → Animation pipeline.")
 print("Keep this Kaggle session running while using TURN. Stopping the session stops the worker.")
 print("Worker PID:", worker.pid, "| Tunnel PID:", tunnel.pid)
