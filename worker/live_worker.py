@@ -11,6 +11,8 @@ from typing import Optional
 import cv2
 import numpy as np
 import torch
+import onnxruntime as ort
+ort.preload_dlls(cuda=False, cudnn=False)
 from fastapi import FastAPI, WebSocket, WebSocketDisconnect
 from fastapi.middleware.cors import CORSMiddleware
 import uvicorn
@@ -37,6 +39,8 @@ def load_engine():
         return
     if not torch.cuda.is_available():
         raise RuntimeError("CUDA GPU is required for TURN inference.")
+    if "CUDAExecutionProvider" not in ort.get_available_providers():
+        raise RuntimeError("ONNX Runtime CUDA provider is unavailable. Install onnxruntime-gpu in the Kaggle environment.")
     inf_cfg = InferenceConfig(device_id=0, flag_use_half_precision=True,
         flag_stitching=True, flag_relative_motion=True, flag_pasteback=True,
         flag_do_crop=True, flag_do_rot=True, driving_option="pose-friendly",
