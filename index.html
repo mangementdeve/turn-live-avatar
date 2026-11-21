@@ -25,6 +25,7 @@ button,input{font:inherit}button{cursor:pointer}.shell{max-width:1240px;margin:a
 <section class="panel"><div class="panel-head"><h2>02 / Device status</h2><span class="sub">Browser permissions</span></div><div class="inner checks"><div class="check"><span>Camera access</span><strong class="state" id="camState">Not checked</strong></div><div class="check"><span>Microphone</span><strong class="state" id="micState">Not checked</strong></div><div id="micHelp" class="notice hidden" role="status" aria-live="polite"></div><div class="check"><span>Avatar image</span><strong class="state" id="imageState">Not selected</strong></div></div></section>
 <section class="panel"><div class="panel-head"><h2>03 / Animation pipeline</h2><span class="sub">Implementation status</span></div><div class="inner"><div class="check"><span>Movement source</span><strong class="state">Webcam + voice</strong></div><div class="check" style="margin-top:9px"><span>Identity priority</span><strong class="state">Maximum preservation</strong></div><div class="check" style="margin-top:9px"><span>Static portrait output</span><strong class="state ok">This stage</strong></div><div class="check" style="margin-top:9px"><span>Face movement / tracking</span><strong class="state">Not started</strong></div><div class="check" style="margin-top:9px"><span>ManyCam virtual camera</span><strong class="state">Not connected</strong></div><div class="notice">AI mode connects this page to your own active Kaggle GPU worker. Webcam frames are sent to that worker and returned as animated frames. Your microphone audio is not uploaded; select your real microphone separately in the calling app.</div>
 <div style="margin-top:16px"><label class="field-label" for="workerUrl">Kaggle GPU worker address</label><input id="workerUrl" type="url" placeholder="https://your-tunnel.trycloudflare.com" style="width:100%;padding:11px;border-radius:10px;border:1px solid #35445a;background:#0b111b;color:#f4f7fb">
+<label class="field-label" for="workerToken" style="margin-top:12px">Private worker token</label><input id="workerToken" type="password" autocomplete="off" placeholder="Paste the token printed by Kaggle" style="width:100%;padding:11px;border-radius:10px;border:1px solid #35445a;background:#0b111b;color:#f4f7fb">
 <label style="display:flex;gap:9px;align-items:flex-start;margin-top:12px;font-size:12px;color:#c6d2e1"><input id="remoteConsent" type="checkbox" style="margin-top:3px"> I own this portrait or have permission to animate it, and I agree to send it and webcam frames to my GPU worker for processing.</label>
 <div class="sub" id="workerState" role="status" aria-live="polite" style="margin-top:10px">GPU worker not connected</div>
 <div class="sub" style="margin-top:8px">Use the HTTPS tunnel address printed by the Kaggle worker. TURN converts it to a secure WebSocket connection.</div></div></div></section>
@@ -131,7 +132,7 @@ function getWorkerSocketUrl(){
  const u=new URL(raw);
  if(u.protocol==='https:')u.protocol='wss:';else if(u.protocol==='http:')u.protocol='ws:';
  if(u.protocol!=='wss:'&&u.protocol!=='ws:')throw new Error('Worker address must use HTTPS or WSS.');
- u.pathname='/ws';u.search='';return u.toString();
+ u.pathname='/ws';u.search='';const token=document.getElementById('workerToken').value.trim();if(!token)throw new Error('Paste the private worker token printed by Kaggle.');u.searchParams.set('token',token);return u.toString();
 }
 function fileAsDataUrl(file){return new Promise((resolve,reject)=>{const r=new FileReader();r.onload=()=>resolve(r.result);r.onerror=reject;r.readAsDataURL(file);});}
 async function connectGpuWorker(){
@@ -147,7 +148,7 @@ async function connectGpuWorker(){
   if(typeof event.data==='string'){
    let msg;try{msg=JSON.parse(event.data);}catch(_){return;}
    if(msg.type==='ready'){workerReady=true;workerStatus('GPU worker ready · '+(msg.device||'CUDA'),true);document.getElementById('previewStatus').textContent='AI AVATAR LIVE';outputMessage.textContent='LivePortrait is processing webcam frames on your remote GPU. The original microphone stays local.';}
-   else if(msg.type==='error'){workerReady=false;workerStatus('Worker error: '+msg.message);outputMessage.textContent=msg.message;}
+   else if(msg.type==='error'){workerReady=false;workerBusy=false;workerStatus('Worker error: '+msg.message);outputMessage.textContent=msg.message;}
    else if(msg.type==='stats'){workerStatus('GPU worker active · '+msg.frames+' frames · latest inference '+msg.worker_ms+' ms',true);}
    return;
   }
