@@ -133,6 +133,11 @@ def health():
 
 @app.websocket("/ws")
 async def stream(ws: WebSocket):
+    expected = os.environ.get("TURN_WORKER_TOKEN", "")
+    supplied = ws.query_params.get("token", "")
+    if not expected or supplied != expected:
+        await ws.close(code=1008, reason="Invalid worker token")
+        return
     await ws.accept()
     try:
         hello = await ws.receive_text()
