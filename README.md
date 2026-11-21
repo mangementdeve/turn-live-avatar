@@ -15,6 +15,15 @@ A lightweight browser frontend for a consent-based, identity-preserving live por
 
 The portrait selection is currently browser-local. Images are not uploaded to an AI service, stored in an account, or committed to this repository. The ManyCam output window mirrors the current local canvas only; it does not turn the existing face-crop overlay into AI animation.
 
+
+## Remote LivePortrait worker connector
+
+The site now has a consent-gated WebSocket client for the TURN GPU worker. It can send the selected portrait once, stream webcam frames to the worker, and render returned LivePortrait frames in the existing output canvas. The original microphone is intentionally not uploaded; select the real microphone separately in the calling application.
+
+The worker implementation and Kaggle launcher are in [worker/](worker/README.md). The user must start the worker in their existing Kaggle GPU session and paste its HTTPS tunnel URL and private session token into TURN. The worker uses a per-session random token and periodic 203-point landmark tracking between face detections.
+
+**Status:** the code path is implemented in the repository but has not yet been run end-to-end from the deployed site against the user's live Kaggle session. Kaggle is temporary compute, not an always-on free production host. Previous tracked processing was 4.42 FPS before integrating the CUDA ONNX landmark provider; real browser-to-worker throughput must be measured before claiming real-time call quality.
+
 ## Product requirements
 
 TURN is intended to animate a user-selected source portrait while preserving the source person's identity and natural appearance. The webcam is the driving-motion source (head pose, expression, blinking and mouth movement); the user's real microphone audio is passed through and synchronized with the returned video. The system must not replace the source identity with a newly generated face or apply beauty/smoothing filters.
