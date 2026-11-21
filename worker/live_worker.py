@@ -76,26 +76,28 @@ def render_frame(frame_rgb, identity, state, index):
     h, w = frame_rgb.shape[:2]
     # Re-detect periodically; track landmarks between detections.
     detect = state["landmarks"] is None or index % 30 == 0
+    runner = cropper.human_landmark_runner
     if detect:
-        crop = cropper.crop_source_image(frame_rgb, crop_cfg)
-        if crop is None:
+        faces = cropper.face_analysis_wrapper.get(
+            cv2.cvtColor(frame_rgb, cv2.COLOR_RGB2BGR),
+            flag_do_landmark_2d_106=True,
+            direction=crop_cfg.direction,
+            max_face_num=crop_cfg.max_face_num,
+        )
+        if not faces:
             return None
-        state["landmarks"] = crop.get("lmk")
-        if state["landmarks"] is None:
-            # Cropper's aligned landmarks are a safe fallback for the next tracking step.
-            state["landmarks"] = crop.get("lmk_crop")
+        landmarks = runner.run(frame_rgb, faces[0].landmark_2d_106)
     else:
-        runner = cropper.human_landmark_runner
-        tracked = runner.run(frame_rgb, state["landmarks"])
-        crop = crop_image(frame_rgb, tracked, dsize=224, scale=1.5, vy_ratio=-0.1)
-        crop["lmk_crop"] = crop["pt_crop"]
-        crop["img_crop_256x256"] = cv2.resize(crop["img_crop"], (256, 256))
-        state["landmarks"] = tracked
-
-    if crop is None:
-        return None
-    if detect and state["landmarks"] is not None and "lmk" not in crop:
-        state["landmarks"] = state["landmarks"]
+        landmarks = runner.run(frame_rgb, state["landmarks"])
+    state["landmarks"] = landmarks
+    crop = crop_image(
+        frame_rgb, landmarks, dsize=crop_cfg.dsize, scale=crop_cfg.scale,
+        vx_ratio=crop_cfg.vx_ratio, vy_ratio=crop_cfg.vy_ratio,
+        flag_do_rot=crop_cfg.flag_do_rot,
+    )
+    crop["img_crop_256x256"] = cv2.resize(
+        crop["img_crop"], (256, 256), interpolation=cv2.INTER_AREA
+    )
     driving = wrapper.prepare_source(crop["img_crop_256x256"])
     d_info = wrapper.get_kp_info(driving)
     R_d = module.get_rotation_matrix(d_info["pitch"], d_info["yaw"], d_info["roll"])
