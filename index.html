@@ -56,13 +56,16 @@ function drawPortraitOutput(){
 }
 function activatePortraitOutput(){
  if(!portraitImage)return;
- sizeOutputCanvas();portraitCanvas.style.display='block';empty.classList.add('hidden');
- if(!portraitStream&&portraitCanvas.captureStream)portraitStream=portraitCanvas.captureStream(30);
- document.getElementById('previewStatus').textContent=stream?'FACE REPLACEMENT ACTIVE':'WAITING FOR CAMERA';
- document.getElementById('cameraTag').textContent=stream?'UPLOADED FACE':'START CAMERA';
- outputState.textContent=stream?'Face overlay active':'Waiting for webcam';outputState.classList.toggle('ok',!!stream);
- outputMessage.textContent='The uploaded portrait supplies the face. Start the webcam to show the live camera scene with that face overlaid. Expressions and head-angle animation are not applied in this first stage.';
- activateOutput.disabled=false;document.getElementById('openOutput').disabled=false;
+ // A selected portrait is an identity source, never a camera-output frame.
+ portraitCanvas.style.display='none';
+ empty.classList.remove('hidden');
+ document.getElementById('previewStatus').textContent='PORTRAIT READY';
+ document.getElementById('cameraTag').textContent='START CAMERA';
+ outputState.textContent='Portrait selected — camera not started';
+ outputState.classList.remove('ok');
+ outputMessage.textContent='Your portrait is loaded as the identity source. Click “Start live face replacement” to start the webcam and processing. TURN will not display the still portrait as if it were live camera output.';
+ activateOutput.disabled=true;
+ document.getElementById('openOutput').disabled=true;
 }
 let faceDetector=null,faceLoop=0,detectorLoading=false,portraitFaceCrop=null;
 async function ensureFaceDetector(){
@@ -107,6 +110,8 @@ function renderFaceReplacement(){
     const c=portraitFaceCrop;
     portraitCtx.save();portraitCtx.beginPath();portraitCtx.ellipse(x+bw*.5,y+bh*.52,bw*.53,bh*.62,0,0,Math.PI*2);portraitCtx.clip();
     portraitCtx.drawImage(portraitImage,c.x,c.y,c.w,c.h,x-bw*.06,y-bh*.12,bw*1.12,bh*1.25);portraitCtx.restore();
+    portraitCanvas.style.display='block';empty.classList.add('hidden');
+    document.getElementById('openOutput').disabled=false;
    }
   }
  }catch(err){}
@@ -157,6 +162,9 @@ async function connectGpuWorker(){
   if(portraitCanvas.width!==bitmap.width||portraitCanvas.height!==bitmap.height){portraitCanvas.width=bitmap.width;portraitCanvas.height=bitmap.height;}
   portraitCtx.drawImage(bitmap,0,0);bitmap.close();
   workerFrameCount++;
+  portraitCanvas.style.display='block';empty.classList.add('hidden');
+  document.getElementById('openOutput').disabled=false;
+  outputState.textContent='GPU-processed camera frames arriving';outputState.classList.add('ok');
  };
  workerSocket.onerror=()=>{workerReady=false;workerStatus('Worker connection failed. Check the Kaggle tunnel and worker logs.');};
  workerSocket.onclose=()=>{workerReady=false;workerBusy=false;workerStatus('GPU worker disconnected.');};
