@@ -1,5 +1,5 @@
 """
-TURN LivePortrait WebSocket worker.
+NTRU LivePortrait WebSocket worker.
 Run inside the existing Kaggle LivePortrait environment.
 The browser sends one portrait at session start, then JPEG webcam frames.
 The worker returns JPEG avatar frames. Original microphone audio stays local
@@ -24,7 +24,7 @@ from src.config.crop_config import CropConfig
 from src.live_portrait_pipeline import LivePortraitPipeline
 from src.utils.cropper import crop_image
 
-app = FastAPI(title="TURN LivePortrait Worker")
+app = FastAPI(title="NTRU LivePortrait Worker")
 app.add_middleware(CORSMiddleware, allow_origins=["*"], allow_methods=["*"], allow_headers=["*"])
 pipeline = None
 wrapper = cropper = None
@@ -38,7 +38,7 @@ def load_engine():
     if pipeline is not None:
         return
     if not torch.cuda.is_available():
-        raise RuntimeError("CUDA GPU is required for TURN inference.")
+        raise RuntimeError("CUDA GPU is required for NTRU inference.")
     if "CUDAExecutionProvider" not in ort.get_available_providers():
         raise RuntimeError("ONNX Runtime CUDA provider is unavailable. Install onnxruntime-gpu in the Kaggle environment.")
     inf_cfg = InferenceConfig(device_id=0, flag_use_half_precision=True,
@@ -151,7 +151,7 @@ async def stream(ws: WebSocket):
         async with gpu_lock:
             identity = prepare_identity(portrait)
         state = {"landmarks": None, "reference": None, "R0": None, "d0": None}
-        await ws.send_json({"type":"ready","message":"TURN GPU worker ready","device":str(device)})
+        await ws.send_json({"type":"ready","message":"NTRU GPU worker ready","device":str(device)})
         count = 0
         while True:
             payload = await ws.receive_bytes()
