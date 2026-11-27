@@ -17,7 +17,7 @@ LOG_DIR.mkdir(exist_ok=True)
 if not ROOT.exists() or not (ROOT / "inference.py").exists():
     raise SystemExit("LivePortrait repository not found at /kaggle/working/LivePortrait.")
 if not WORKER.exists():
-    raise SystemExit("TURN worker file missing. Clone mangementdeve/turn-live-avatar first.")
+    raise SystemExit("NTRU worker file missing. Clone mangementdeve/turn-live-avatar first.")
 
 # Kaggle's already-running notebook kernel may have an older CPU-only ONNX
 # module loaded. This starts a fresh Python process, which imports the installed
@@ -41,13 +41,13 @@ worker = subprocess.Popen(
     start_new_session=True,
     env=worker_env,
 )
-print("Starting TURN LivePortrait worker (model loading can take 1–2 minutes)…")
+print("Starting NTRU LivePortrait worker (model loading can take 1–2 minutes)…")
 
 import urllib.request
 for _ in range(180):
     if worker.poll() is not None:
         print((LOG_DIR / "worker.log").read_text(errors="ignore")[-6000:])
-        raise SystemExit("TURN worker exited before becoming ready.")
+        raise SystemExit("NTRU worker exited before becoming ready.")
     try:
         with urllib.request.urlopen(f"http://127.0.0.1:{PORT}/health", timeout=2) as response:
             print("Worker health:", response.read().decode())
@@ -84,9 +84,9 @@ if not public_url:
     print((LOG_DIR / "tunnel.log").read_text(errors="ignore")[-4000:])
     raise SystemExit("Tunnel URL not found. Check /kaggle/working/turn-logs/tunnel.log.")
 
-print("\\nTURN GPU WORKER IS AVAILABLE")
+print("\\nNTRU GPU WORKER IS AVAILABLE")
 print("Worker URL:", public_url)
 print("Worker token:", worker_token)
-print("Paste the URL and token into TURN Studio → Animation pipeline.")
-print("Keep this Kaggle session running while using TURN. Stopping the session stops the worker.")
+print("Paste the URL and token into NTRU Studio → Animation pipeline.")
+print("Keep this Kaggle session running while using NTRU. Stopping the session stops the worker.")
 print("Worker PID:", worker.pid, "| Tunnel PID:", tunnel.pid)
