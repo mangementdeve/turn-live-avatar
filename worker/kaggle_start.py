@@ -31,7 +31,7 @@ if not cloudflared.exists():
 
 worker_token = secrets.token_urlsafe(32)
 worker_env = os.environ.copy()
-worker_env["TURN_WORKER_TOKEN"] = worker_token
+worker_env["NTRU_WORKER_TOKEN"] = worker_token
 worker_log = open(LOG_DIR / "worker.log", "w")
 worker = subprocess.Popen(
     [sys.executable, str(WORKER)],
