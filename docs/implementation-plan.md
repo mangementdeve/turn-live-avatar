@@ -1,4 +1,4 @@
-# TURN implementation plan
+# NTRU implementation plan
 
 ## Product decision
 
@@ -23,8 +23,8 @@
 3. Worker uses the webcam frames as driving motion and the uploaded portrait as the identity source.
 4. Worker returns the animated video stream.
 5. Original microphone audio is forwarded as an audio track and synchronized with the returned video.
-6. TURN renders the returned audio/video in the browser.
-7. ManyCam captures the TURN output; the call application selects ManyCam as its camera.
+6. NTRU renders the returned audio/video in the browser.
+7. ManyCam captures the NTRU output; the call application selects ManyCam as its camera.
 
 The preferred transport is WebRTC (media tracks plus a signaling channel). A WebSocket/JPEG-frame prototype may be used for an early latency experiment, but it is not the intended final transport.
 
@@ -83,7 +83,7 @@ Acceptance: selecting, replacing and removing images works; no image is sent to 
 - [ ] Capture a short webcam driving clip in the browser without recording microphone audio.
 - [ ] Submit the selected portrait and driving clip to the verified endpoint.
 - [ ] Display the returned processed video and handle provider queue/errors.
-- [ ] Provision a TURN-owned remote GPU environment.
+- [ ] Provision a NTRU-owned remote GPU environment.
 - [ ] Pin a known LivePortrait revision and its model weights.
 - [ ] Run a short test using a user-authorized portrait and a webcam driving clip.
 - [ ] Compare the output with the source for facial identity, skin texture, skin tone, eye/lip geometry, expression range and artifacts.
@@ -114,7 +114,7 @@ Acceptance: video and voice remain synchronized during a sustained test.
 
 ### Milestone 5 — ManyCam integration
 
-- [x] Add a dedicated output window that mirrors the current TURN canvas for capture by another desktop application.
+- [x] Add a dedicated output window that mirrors the current NTRU canvas for capture by another desktop application.
 - [ ] Test whether ManyCam Vision 4.11.2 can capture that window reliably.
 - [ ] Verify no recursive camera feedback.
 - [ ] Verify the call application receives the intended video and audio devices.
@@ -138,7 +138,7 @@ The frontend identity-selection milestone is implemented in `index.html`. The cu
 
 A free GPU notebook is not automatically a production GPU server. The following options are candidates with distinct constraints:
 
-| Provider | Free access found | Can it be the permanent TURN live worker? |
+| Provider | Free access found | Can it be the permanent NTRU live worker? |
 |---|---|---|
 | Kaggle Notebooks | Weekly GPU quota (commonly 30 hours); interactive sessions have time limits and capacity can vary. | No guarantee of stable public WebRTC ingress/egress or uninterrupted hosting. Use for building and model optimization, not the production endpoint. |
 | Hugging Face ZeroGPU | 5 GPU minutes per day on a free account; Gradio-only ZeroGPU hosting. | No; daily quota and request-oriented GPU allocation are unsuitable for continuous calls. |
@@ -147,7 +147,7 @@ A free GPU notebook is not automatically a production GPU server. The following 
 | Modal | Starter includes monthly compute credits, but a payment method and billing safeguards may be required; overage can cost money. | Not a strict no-card/no-charge solution unless account-level spending is safely disabled and credits are sufficient. |
 | SageMaker Studio Lab | Existing users may have limited GPU sessions; AWS says it is no longer open to new customers. | Not a new-account solution and does not provide production model deployment. |
 
-No provider above is currently verified as a guaranteed, always-on, zero-cost GPU service for TURN. Do not build a production promise around free trial credits, notebook sessions, queued demos, or a GPU allowance.
+No provider above is currently verified as a guaranteed, always-on, zero-cost GPU service for NTRU. Do not build a production promise around free trial credits, notebook sessions, queued demos, or a GPU allowance.
 
 ## Current implementable work versus remaining work
 
@@ -169,4 +169,4 @@ No provider above is currently verified as a guaranteed, always-on, zero-cost GP
 - Run sustained quality, latency, stability and privacy acceptance tests.
 
 ### Production acceptance gate
-TURN is not considered complete until a user-authorized portrait is animated live from webcam movement, the output is sustained beyond the daily quota of any demo service, original microphone audio remains synchronized, ManyCam receives the output, and the complete path has been tested end-to-end.
+NTRU is not considered complete until a user-authorized portrait is animated live from webcam movement, the output is sustained beyond the daily quota of any demo service, original microphone audio remains synchronized, ManyCam receives the output, and the complete path has been tested end-to-end.
