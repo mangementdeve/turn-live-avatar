@@ -1,12 +1,12 @@
-# TURN Kaggle GPU worker
+# NTRU Kaggle GPU worker
 
-This worker connects the existing TURN website to the LivePortrait models already installed in the Kaggle session. It caches the uploaded source identity once, tracks the webcam face between periodic detections, and returns processed frames over a secure WebSocket tunnel.
+This worker connects the existing NTRU website to the LivePortrait models already installed in the Kaggle session. It caches the uploaded source identity once, tracks the webcam face between periodic detections, and returns processed frames over a secure WebSocket tunnel.
 
 ## Start it in the existing Kaggle notebook
 
 Do not restart the notebook kernel if it contains unsaved work. Run these cells in order.
 
-**Cell 1 — clone the TURN worker files**
+**Cell 1 — clone the NTRU worker files**
 
 ```python
 !git clone https://github.com/mangementdeve/turn-live-avatar.git /kaggle/working/turn-live-avatar
@@ -34,7 +34,7 @@ The worker expects the LivePortrait repository at `/kaggle/working/LivePortrait`
 
 Wait for the output line `Worker URL: https://....trycloudflare.com`.
 
-## Connect TURN
+## Connect NTRU
 
 1. Open https://turn-live-avatar.vercel.app.
 2. Choose your authorized source portrait.
@@ -43,12 +43,12 @@ Wait for the output line `Worker URL: https://....trycloudflare.com`.
 5. Click **Start live face replacement**.
 6. Wait for **GPU worker ready · cuda:0** and then move your head and speak.
 
-The worker sends the processed video frames back to the TURN canvas. Open the ManyCam output window from TURN to capture that canvas. Select your real microphone directly in the video-call application; this first worker does not transmit audio.
+The worker sends the processed video frames back to the NTRU canvas. Open the ManyCam output window from NTRU to capture that canvas. Select your real microphone directly in the video-call application; this first worker does not transmit audio.
 
 ## Important operating limits
 
-- The Kaggle notebook and tunnel must remain running. Closing, idling out, or stopping the Kaggle session disconnects TURN.
-- The free Cloudflare quick tunnel URL changes when restarted. Paste the new URL into TURN after each restart.
+- The Kaggle notebook and tunnel must remain running. Closing, idling out, or stopping the Kaggle session disconnects NTRU.
+- The free Cloudflare quick tunnel URL changes when restarted. Paste the new URL into NTRU after each restart.
 - This is an initial live streaming bridge, not a guaranteed always-on production host. Actual frame rate depends on Kaggle GPU load and network latency; the previous tracked-video benchmark was 4.42 FPS before CUDA ONNX landmark tracking was integrated. Do not assume 25 FPS until measured end-to-end.
 - Media is sent to the worker URL you provide. Use a portrait you own or have permission to animate. Frames are processed in memory; the worker does not intentionally save them.
 - The original microphone is not uploaded. Select the actual microphone as the call app's audio input.
